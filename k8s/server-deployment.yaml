@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: beaglefoot/multi-server
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: '6379' # Make sure this is a string
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: '5432' # Make sure this is a string
+            - name: PGDATABASE
+              value: postgres
+            # PGPASSWORD is set up imperatively from command line
+            - name: PGPASSWORD # Name inside container (may be different from Secret key)
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword # Secret name created from command line
+                  key: PGPASSWORD # key in Secret
