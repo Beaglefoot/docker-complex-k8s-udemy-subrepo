@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 app.get('/values/all', async (req, res) => {
   const values = await pgClient.query('SELECT * from values');
 
-  res.send(values.rows);
+  res.send([{ number: -100 }, ...values.rows]);
 });
 
 app.get('/values/current', async (req, res) => {

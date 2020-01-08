@@ -1,0 +1,39 @@
+apiVersion: skaffold/v2alpha1
+kind: Config
+build:
+  local:
+    push: false
+  artifacts:
+    - image: beaglefoot/multi-client
+      context: client
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        infer:
+          - '**/*.js'
+          - '**/*.css'
+          - '**/*.html'
+    - image: beaglefoot/multi-server
+      context: server
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        infer:
+          - '**/*.js'
+    - image: beaglefoot/multi-worker
+      context: worker
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        infer:
+          - '**/*.js'
+deploy:
+  kubeContext: minikube
+  kubectl:
+    manifests:
+      # No persistent data should be here
+      - k8s/client-deployment.yaml
+      - k8s/server-deployment.yaml
+      - k8s/worker-deployment.yaml
+      - k8s/server-cluster-ip-service.yaml
+      - k8s/client-cluster-ip-service.yaml
